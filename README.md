@@ -1,4 +1,4 @@
-# Service Desk AI landing page (Landing 1.0.0)
+# Service Desk AI landing page (Landing 2.0.0)
 
 The public front page of rentaldeskai.com for people who are not signed in.
 It is kept separate from the Rental Desk AI app: its own folder, its own version line ("Landing x.y.z"),
@@ -33,3 +33,10 @@ and updating it never rebuilds or restarts the app.
 ## Open points
 - The page shows `Farouk@servicedeskai.com`. That domain is not registered to Farouk (it is listed for sale), so mail to it bounces until it is.
 - The six recordings must be checked frame by frame by Farouk before this goes public.
+
+## Landing 2.0.0 (16/10/2026)
+- New design approved by Farouk: a night opening with gold light and a 3D view of the platform, the six steps of Rental Desk AI around the RD logo, solutions, agents, how it works, what it delivers, founder and contact.
+- Same files and serving rules as 1.0.0: `index.html`, `landing.css`, `landing.js`, self-hosted fonts, no inline scripts, no requests to other hosts.
+- A "Sign in" link to `/login` in the top bar.
+- The six recordings and `theme.js` stay in the repo but are not used by this version (kept for a later demo section and for rollback).
+- Rollback: set `LANDING_REF` back to `a6d99df6e783bea8fbc4447a1f6e65e9a19b9caa` (Landing 1.0.0).
