@@ -1,0 +1,73 @@
+services:
+  web:
+    image: nginx:alpine
+    environment:
+      LANDING_REF: COMMIT
+    command:
+      - /bin/sh
+      - -c
+      - set -e; rm -rf /srv/site /tmp/x; mkdir -p /srv/site /tmp/x; wget -qO /tmp/s.tgz "https://codeload.github.com/faroukibrahem2-lab/servicedeskai-landing/tar.gz/$${LANDING_REF}"; tar xzf /tmp/s.tgz -C /tmp/x; cp -r /tmp/x/*/. /srv/site/; cd /srv/site; sha256sum -c SHA256SUMS > /dev/null; echo "landing files OK $${LANDING_REF}"; exec nginx -g 'daemon off;'
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/conf.d/default.conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.landing.loadbalancer.server.port=80
+      - traefik.http.routers.site-assets.rule=Host(`rentaldeskai.com`) && PathPrefix(`/landing/`)
+      - traefik.http.routers.site-assets.priority=10000
+      - traefik.http.routers.site-assets.entrypoints=websecure
+      - traefik.http.routers.site-assets.tls.certresolver=letsencrypt
+      - traefik.http.routers.site-assets.service=landing
+      - traefik.http.routers.site-home.rule=Host(`rentaldeskai.com`) && Path(`/`) && !HeaderRegexp(`Cookie`, `(^|[; ])rd_session=`)
+      - traefik.http.routers.site-home.priority=10000
+      - traefik.http.routers.site-home.entrypoints=websecure
+      - traefik.http.routers.site-home.tls.certresolver=letsencrypt
+      - traefik.http.routers.site-home.service=landing
+      - traefik.http.routers.landing.rule=Host(`rentaldeskai.com`) || Host(`www.rentaldeskai.com`) || Host(`app.rentaldeskai.com`)
+      - traefik.http.routers.landing.entrypoints=websecure
+      - traefik.http.routers.landing.tls.certresolver=letsencrypt
+      - traefik.http.routers.landing.service=landing
+      - traefik.http.routers.techredirect.rule=Host(`rentaldeskai.tech`) || Host(`www.rentaldeskai.tech`) || Host(`app.rentaldeskai.tech`)
+      - traefik.http.routers.techredirect.entrypoints=websecure
+      - traefik.http.routers.techredirect.tls.certresolver=letsencrypt
+      - traefik.http.routers.techredirect.service=landing
+      - traefik.http.routers.techredirect.middlewares=to-com
+      - traefik.http.middlewares.to-com.redirectregex.regex=^https?://(www\.|app\.)?rentaldeskai\.tech/(.*)
+      - traefik.http.middlewares.to-com.redirectregex.replacement=https://rentaldeskai.com/$${2}
+      - traefik.http.middlewares.to-com.redirectregex.permanent=true
+    restart: unless-stopped
+
+configs:
+  nginx_conf:
+    content: |
+      server {
+        listen 80 default_server;
+        server_name _;
+        root /srv/site;
+        server_tokens off;
+        charset utf-8;
+        gzip on;
+        gzip_types text/css application/javascript image/svg+xml;
+        set $$csp "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'";
+
+        location = / {
+          try_files /index.html =404;
+          add_header Content-Security-Policy $$csp always;
+          add_header Cache-Control "no-cache" always;
+          add_header X-Content-Type-Options "nosniff" always;
+          add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+          add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+        }
+
+        location /landing/ {
+          alias /srv/site/;
+          add_header Content-Security-Policy $$csp always;
+          add_header Cache-Control "public, max-age=604800" always;
+          add_header X-Content-Type-Options "nosniff" always;
+        }
+
+        location / {
+          return 404;
+        }
+      }
+
