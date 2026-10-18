@@ -1,10 +1,12 @@
-/* Rental Desk AI landing page, Landing 3.0.0 */
+/* Rental Desk AI landing page, Landing 3.0.1 */
 (function () {
   "use strict";
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var hasG = !!(window.gsap && window.ScrollTrigger);
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* Farouk, 18/10/2026: the same animated page on every device, also when a phone asks for reduced motion.
+     The still version is kept only for browsers where the motion library does not load. */
+  var reduce = false;
   var NS = "http://www.w3.org/2000/svg";
   if (!hasG || reduce) document.documentElement.classList.add("static");
   function mk(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
@@ -260,9 +262,11 @@
     }, onComplete: function () { el.textContent = final; } });
   }
 
+  ScrollTrigger.config({ ignoreMobileResize: true });
   var mm = gsap.matchMedia();
   mm.add({ desk: "(min-width: 981px)", phone: "(max-width: 980px)", fine: "(hover: hover) and (pointer: fine)", wide: "(min-width: 1320px)" }, function (ctx) {
     var c = ctx.conditions, clean = [];
+    try {
 
     /* Hero: the statement rises line by line; the desk swings in; the three chips follow in order */
     var hw = splitWords($("#h1")), shineEm = $("#h1 em"), label = $(".hcopy > .code");
@@ -442,10 +446,20 @@
         .to(cols, { backgroundColor: "#ffffff", duration: .4 }, 3.7).to({}, { duration: .3 }, 4.1);
       ScrollTrigger.create({ trigger: "#roadmap", start: "top top", end: function () { return "+=" + Math.round(window.innerHeight * 2.2); }, pin: true, scrub: .8, animation: rtl, invalidateOnRefresh: true });
     } else {
-      cols.forEach(function (cl) {
-        gsap.fromTo(cl.children, { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6, stagger: .08, ease: "power3.out", scrollTrigger: { trigger: cl, start: "top 82%" } });
-        gsap.fromTo($$("li", cl), { x: -10, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .45, stagger: .08, ease: "power3.out", delay: .2, scrollTrigger: { trigger: cl, start: "top 82%" } });
+      /* phone and tablet: the same three slides, side by side, moved across as you scroll */
+      var road = $("#roadmap"), track = $(".cols", road), pitems = cols.map(function (cl) { return $$("li", cl); });
+      road.classList.add("rh");
+      var step = function () { return (cols[0].offsetWidth + 12) * (document.documentElement.dir === "rtl" ? 1 : -1); };
+      var ptl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      ptl.set([].concat.apply([], pitems), { autoAlpha: 0, x: -10 });
+      cols.forEach(function (cl, i) {
+        var at = i * 1.2;
+        if (i) ptl.to(track, { x: function () { return step() * i; }, duration: .8, ease: "power2.inOut" }, at - .6);
+        ptl.to(pitems[i], { autoAlpha: 1, x: 0, duration: .4, stagger: .1 }, at + .1);
       });
+      ptl.to({}, { duration: .4 }, 3.2);
+      ScrollTrigger.create({ trigger: road, start: "top top", end: function () { return "+=" + Math.round(window.innerHeight * 2); }, pin: true, scrub: .8, animation: ptl, invalidateOnRefresh: true });
+      clean.push(function () { road.classList.remove("rh"); });
     }
 
     /* Service Desk AI: solved paths draw through the field, then their amber nodes appear */
@@ -508,6 +522,11 @@
       clean.push(function () { ScrollTrigger.removeEventListener("refresh", buildThread); thST.kill(); th.remove(); });
     }
 
+    } catch (err) {
+      /* if any animation cannot start on this browser, show the complete still page instead of a broken one */
+      if (window.console) console.error(err);
+      setTimeout(function () { mm.revert(); document.documentElement.classList.add("static"); ScrollTrigger.refresh(); }, 0);
+    }
     return function () { clean.forEach(function (f) { f(); }); };
   });
   window.addEventListener("load", function () { ScrollTrigger.refresh(); });

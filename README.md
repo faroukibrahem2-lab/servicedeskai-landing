@@ -1,4 +1,4 @@
-# Rental Desk AI landing page (Landing 3.0.0)
+# Rental Desk AI landing page (Landing 3.0.1)
 
 The public front page of rentaldeskai.com for visitors who are not signed in.
 It is separate from the Rental Desk AI app: its own repository, its own version line ("Landing x.y.z").
@@ -9,7 +9,9 @@ Rental Desk AI in its ivory identity, endorsed "by Service Desk AI" (the Lattice
 Sections: hero ("Prepared by AI. Decided by you."), the problem (a scattered rental desk falling into one path),
 what it does (five pinned steps: reads, checks, drafts, tracks, you decide), the team with the Chief of Staff,
 a note from the founder, trust, Now · Next · Later, the Service Desk AI band, and a demonstration request.
-English and Arabic (language button; Arabic is right to left). Reduced motion shows every section in its final state.
+English and Arabic (language button; Arabic is right to left).
+
+3.0.1 (18/10/2026, Farouk: the same page on phones as on the web): the animations now run on every device, also when the phone asks for reduced motion (iPhones with Reduce Motion switched on were getting the still version). On phones and tablets the roadmap is three slides moved across as you scroll, and the big step number shows. If the motion library cannot start, the complete still page is shown instead of a broken one.
 
 - The demonstration request opens the visitor's own email app, addressed to farouk@erlaw.ae
   (until Farouk@servicedeskai.com works). Nothing is collected or stored by the site.
@@ -44,7 +46,7 @@ Deploy the same compose file with `LANDING_REF` set to the previous release:
 - Landing 1.0.0: `a6d99df6e783bea8fbc4447a1f6e65e9a19b9caa` (served until 18/10/2026).
 - Landing 2.0.0 (`75074a0`) must not be deployed: its stylesheet locks the page to the first screen.
 
-## Checked before release (18/10/2026)
+## Checked before release (3.0.0 and 3.0.1, 18/10/2026)
 Served locally with `deploy/nginx.conf` and the CSP above, in Chromium at 1440, 820 and 390 px, English and Arabic,
 and with reduced motion: no console errors or warnings, no failed requests, no requests to other hosts,
 no sideways scrolling, every font loaded, the demonstration request opens a mail draft.

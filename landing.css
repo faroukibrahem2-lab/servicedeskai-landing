@@ -1,4 +1,4 @@
-/* Rental Desk AI landing page, Landing 3.0.0. Fonts: Playfair Display, Geist, Geist Mono, IBM Plex Sans Arabic (SIL OFL 1.1), self-hosted. */
+/* Rental Desk AI landing page, Landing 3.0.1. Fonts: Playfair Display, Geist, Geist Mono, IBM Plex Sans Arabic (SIL OFL 1.1), self-hosted. */
 @font-face{font-family:"Playfair Display";font-style:normal;font-weight:400;font-display:swap;src:url(/landing/playfair-display-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Playfair Display";font-style:normal;font-weight:500;font-display:swap;src:url(/landing/playfair-display-latin-500-normal.woff2) format("woff2")}
 @font-face{font-family:"Playfair Display";font-style:italic;font-weight:400;font-display:swap;src:url(/landing/playfair-display-latin-400-italic.woff2) format("woff2")}
@@ -432,7 +432,7 @@ html[lang=ar] .tcard h3{font:600 18px/1.4 var(--f-ar)}
   .scene{height:clamp(300px,70vw,440px)}
   .story .in{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:18px;align-items:stretch;padding-block:max(78px,9vh) 18px}
   .caps{gap:12px}
-  .bignum{display:none}
+  .bignum{font-size:64px;margin:0 0 -6px -2px}
   .cap h3{font-size:26px}
   .cap p{font-size:14.5px}
   .stage{height:auto}
@@ -472,9 +472,13 @@ html[lang=ar] .tcard h3{font:600 18px/1.4 var(--f-ar)}
 .static .stage{height:auto;display:grid;gap:18px;padding:20px;background:transparent;box-shadow:none}
 .static .sc{position:relative;inset:auto;padding:20px;border-radius:18px;background:var(--surface);box-shadow:0 0 0 1px var(--line)}
 .static .sc .lbl{position:static}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
 
 .sign .face{flex:none;width:52px;height:52px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line),0 10px 22px -14px rgba(59,38,24,.6)}
 .form .alt{font-size:13.5px;color:var(--muted)}
 .form .alt a,.flink{color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
 .form .alt a:hover,.flink:hover{text-decoration-color:var(--ink)}
+/* roadmap on phones and tablets: three slides side by side */
+#roadmap.rh{overflow:hidden}
+#roadmap.rh .cols{display:flex;gap:12px;width:max-content;background:none;box-shadow:none;border-radius:0;overflow:visible;will-change:transform}
+#roadmap.rh .col{flex:none;width:calc(100vw - max(32px, env(safe-area-inset-left,0px) + env(safe-area-inset-right,0px) + 32px));max-width:560px;border-radius:18px;box-shadow:0 0 0 1px var(--line),0 18px 40px -32px rgba(59,38,24,.6)}
