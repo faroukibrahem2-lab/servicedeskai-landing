@@ -2,7 +2,7 @@ services:
   web:
     image: nginx:alpine
     environment:
-      LANDING_REF: 09a672b98cca959c309403050a8dc53dfee6f4b6
+      LANDING_REF: 07c4d6c992e4169aafe30aa40459f83321082138
     command:
       - /bin/sh
       - -c
