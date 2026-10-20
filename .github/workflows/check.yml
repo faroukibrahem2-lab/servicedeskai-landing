@@ -1,0 +1,39 @@
+# Checks every push and pull request for the landing page. It TESTS AND REPORTS ONLY: no secrets, no deploy
+# (permissions: contents read). The server runs the commit named in deploy/docker-compose.yml (LANDING_REF) and
+# refuses to start if one file does not match SHA256SUMS; this workflow runs the same checks before that.
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  landing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every file matches SHA256SUMS, and every file is listed
+        run: |
+          sha256sum -c SHA256SUMS
+          git ls-files | grep -v '^\.github/' | grep -vx 'SHA256SUMS' | sort > /tmp/tracked
+          awk '{print $2}' SHA256SUMS | sed 's#^\*##; s#^\./##' | sort > /tmp/listed
+          diff /tmp/tracked /tmp/listed
+      - name: VERSION matches the README title
+        run: grep -q "(Landing $(cat VERSION))" README.md
+      - name: The page obeys the CSP (no inline script, no inline handler, no outside script or request)
+        run: |
+          ! grep -nP '<script(?![^>]*\bsrc=)' index.html
+          ! grep -nP '\son[a-z]+\s*=' index.html
+          ! grep -noP '<(script|img|link|iframe)[^>]+(src|href)="https?://(?!rentaldeskai\.com)[^"]+' index.html
+      - name: Compose file and nginx configuration are valid
+        run: |
+          docker compose -f deploy/docker-compose.yml config --quiet
+          docker run --rm -v "$PWD/deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro" nginx:alpine nginx -t
