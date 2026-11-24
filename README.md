@@ -41,6 +41,8 @@ English and Arabic (language button; Arabic is right to left).
 2. Deploy the project `landing` with `deploy/docker-compose.yml`, `LANDING_REF` set to the new commit (Farouk's yes first).
 3. Check `/`, `/landing/landing.css` and the container log line.
 
+A GitHub Actions workflow named `check` runs on every push and pull request. It verifies that every tracked file matches `SHA256SUMS`, that this README's title includes the `VERSION`, and that CSP, compose and nginx checks pass. It never deploys.
+
 ## Rollback
 Deploy the same compose file with `LANDING_REF` set to the previous release:
 - Landing 1.0.0: `a6d99df6e783bea8fbc4447a1f6e65e9a19b9caa` (served until 18/10/2026).
